@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import cn.qqtheme.framework.picker.MultiPicker;
 
@@ -28,7 +27,6 @@ import cn.qqtheme.framework.picker.MultiPicker;
 public class MultiPickerManager {
 
     private static Map<String, List<String>> sOptionalData = new HashMap<>();
-    private static String[] mProvince;
     private static Gson sJsonParser = new Gson();
 
     public static MultiPicker build(Activity context) {
@@ -62,7 +60,7 @@ public class MultiPickerManager {
         try {
             fis = context.getAssets().open(jsonFileName);
             Country country = sJsonParser.fromJson(new BufferedReader(new InputStreamReader(fis)), new TypeToken<Country>() {}.getType());
-            MultiPickerManager.parseProvince(country);
+            MultiPickerManager.parseProvinceWith(country);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
@@ -73,20 +71,6 @@ public class MultiPickerManager {
                     e.printStackTrace();
                 }
             }
-            MultiPickerManager.initProvinceData();
-            System.out.println("init finished.");
-        }
-    }
-
-    private static void initProvinceData(){
-        Set<String> set = sOptionalData.keySet();
-        if(set.size() > 0) {
-            mProvince = new String[sOptionalData.size()];
-            int i = 0;
-            for(String province: set){
-                mProvince[i]=province;
-                i++;
-            }
         }
     }
 
@@ -94,13 +78,13 @@ public class MultiPickerManager {
      * 解析省份数据
      * @param country
      */
-    private static void parseProvince( Country country){
+    private static void parseProvinceWith( Country country){ 
         if (country != null) {
             sOptionalData.clear();
             List<Province> provinces = country.list;
             if (provinces != null && !provinces.isEmpty()) {
                 for(Province province : provinces){
-                    sOptionalData.put(province.name,parseCity(province.list));
+                    sOptionalData.put(province.name,parseCityWith(province.list));
                 }
             }
         }
@@ -111,7 +95,7 @@ public class MultiPickerManager {
      * @param list
      * @return
      */
-    private static List<String> parseCity(List<City> list){
+    private static List<String> parseCityWith(List<City> list){
         List<String> cities = new ArrayList<>();
         if(list == null || list.isEmpty())return cities;
         for(City city :list){
